@@ -8,8 +8,15 @@
 Aplikasi Rekapitulasi Kinerja (ARK) dirancang untuk mentransformasi sistem pelaporan kinerja manual menjadi platform digital yang efisien, transparan, dan akuntabel. Aplikasi ini bertujuan untuk mendokumentasikan setiap aktivitas harian pegawai secara sistematis guna memudahkan proses pemantauan (monitoring) dan evaluasi kinerja tahunan.
 
 ## 👥 Target Pengguna
-1.  **PPPK Paruh Waktu Tenaga Kependidikan (TENDIK)**: Sebagai pengguna utama untuk menginput laporan kinerja harian dan mengunduh rekapitulasi bulanan.
-2.  **Administrator/Kepala Sekolah**: Sebagai pengawas untuk memantau produktivitas staf TENDIK dan mengelola administrasi sistem.
+1.  **PPPK Paruh Waktu Tenaga Kependidikan (TENDIK)**: Sebagai pengguna utama untuk menginput laporan kinerja harian dan mengunduh rekapitulasi bulanan. Mencakup jabatan:
+    *   🔬 **Laboran**
+    *   📚 **Perpustakaan**
+    *   👤 **Kepegawaian**
+    *   📩 **Persuratan**
+    *   💰 **Keuangan**
+    *   👨‍🎓 **Kesiswaan**
+    *   💻 **Dapodik**
+2.  **Super Admin**: Sebagai pengawas otoritas penuh untuk memantau produktivitas staf TENDIK, mengelola akun pengguna, dan konfigurasi sistem.
 
 ---
 
