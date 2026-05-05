@@ -195,10 +195,13 @@ public function destroy($id) {
         $nama_pegawai = $data->first()->nama ?? auth()->user()->name;
         $pdf = Pdf::loadView('reports.pdf_template', compact('data', 'title', 'nama_bulan', 'year', 'nama_pegawai'));
 
+        $category_name = strtoupper($categories[$category] ?? $category);
+        $filename = "HASIL KERJA_REKAPITULASI_{$category_name}_{$nama_bulan}.pdf";
+
         if ($request->has('stream')) {
-            return $pdf->stream("Rekap-{$role}-{$category}-{$nama_bulan}.pdf");
+            return $pdf->stream($filename);
         }
 
-        return $pdf->download("Rekap-{$role}-{$category}-{$nama_bulan}.pdf");
+        return $pdf->download($filename);
     }
 }

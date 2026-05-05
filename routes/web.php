@@ -4,8 +4,29 @@ use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
+
+// RUTE PERBAIKAN DATABASE HOSTING
+Route::get('/fix-database-hosting', function() {
+    try {
+        if (!Schema::hasColumn('work_reports', 'nama')) {
+            Schema::table('work_reports', function (Blueprint $table) {
+                $table->string('nama')->after('tanggal')->nullable();
+            });
+        }
+        if (!Schema::hasColumn('work_reports', 'keterangan')) {
+            Schema::table('work_reports', function (Blueprint $table) {
+                $table->string('keterangan')->default('Terlaksana')->after('uraian_tugas');
+            });
+        }
+        return "Database Berhasil Diperbaiki!";
+    } catch (\Exception $e) {
+        return "Gagal: " . $e->getMessage();
+    }
+});
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');

@@ -1,4 +1,4 @@
-# 📊 Aplikasi Rekapitulasi Kinerja (ARK) - SMK Negeri 2 Konoha
+# 📊 Aplikasi Rekapitulasi Kinerja (ARK) - SMK Negeri 2 Konoha `v1.2.5`
 
 ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
@@ -64,6 +64,31 @@ Aplikasi ini dilengkapi dengan sistem perlindungan domain melalui **Activation K
     APP_LICENSE_KEY = MD5(request->getHost() . "KONOHA_SECRET_2024")
     ```
 *Catatan: Pastikan License Key ini terdaftar di file `.env` agar aplikasi dapat berjalan di domain yang dituju.*
+
+---
+
+## 🛠️ Log Perbaikan & Update Terbaru (Mei 2026)
+
+Berikut adalah daftar peningkatan yang telah diimplementasikan untuk meningkatkan fungsionalitas dan pengalaman pengguna:
+
+1.  **Integrasi Webcam Capture**: Implementasi pengambilan foto bukti laporan secara langsung melalui kamera laptop/HP (Webcam) menggunakan Canvas API.
+2.  **Dual-Camera Switching**: Penambahan fitur ganti kamera (Depan/Belakang) untuk pengguna mobile guna memudahkan pengambilan foto bukti kerja.
+3.  **Sistem Sinkronisasi Database (Hotfix)**: Pembuatan rute `/fix-database-hosting` untuk melakukan migrasi kolom `nama` dan `keterangan` secara dinamis pada server hosting tanpa merusak data yang sudah ada.
+4.  **Optimasi Penamaan File PDF**: Perubahan format nama file download rekap menjadi `HASIL KERJA_REKAPITULASI_[Kategori]_[Bulan].pdf` untuk kemudahan pengarsipan.
+5.  **Peningkatan Responsivitas UI**: Redesain tabel riwayat dan form input agar lebih ramah pengguna (user-friendly) di perangkat seluler dengan estetika premium.
+6.  **Perbaikan Izin Akses (Permissions)**: Solusi izin akses folder `storage` pada lingkungan XAMPP macOS untuk menjamin kelancaran penyimpanan log dan gambar.
+7.  **Reset Akun Administrator**: Pemulihan akses dashboard melalui reset password masal dan konfigurasi ulang database lokal.
+
+---
+
+## 📜 Riwayat Versi (Versioning)
+
+| Versi | Status | Deskripsi |
+| :--- | :--- | :--- |
+| **v1.2.5** | **Current** | Penambahan fitur Kamera (Depan/Belakang), Perbaikan Database Hosting, & Optimasi Nama File PDF. |
+| **v1.2.0** | Stable | Penambahan fitur Export PDF Professional & Sistem Installer Otomatis. |
+| **v1.1.0** | Stable | Implementasi Dashboard Admin, Manajemen User, & Sistem Multi-Jabatan. |
+| **v1.0.0** | Initial | Rilis awal sistem input laporan kinerja harian. |
 
 ---
 

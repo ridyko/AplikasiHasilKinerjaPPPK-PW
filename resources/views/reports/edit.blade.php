@@ -121,9 +121,12 @@
                     <video id="webcam" autoplay playsinline class="w-full h-full object-cover"></video>
                     <canvas id="canvas" class="hidden"></canvas>
                 </div>
-                <div class="mt-6 flex space-x-3">
+                <div class="mt-6 flex flex-wrap gap-3">
                     <button type="button" onclick="takeSnapshot()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 dark:shadow-none">
                         <i class="fas fa-circle mr-2"></i> JEPRET
+                    </button>
+                    <button type="button" onclick="switchCamera()" class="px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl font-bold hover:bg-slate-200 transition-all">
+                        <i class="fas fa-sync"></i>
                     </button>
                     <button type="button" onclick="closeCamera()" class="px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl font-bold hover:bg-slate-200 transition-all">
                         BATAL
@@ -136,6 +139,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let stream = null;
+        let currentFacingMode = 'environment';
 
         async function openCamera() {
             const modal = document.getElementById('camera-modal');
@@ -144,8 +148,11 @@
             modal.classList.remove('hidden');
             
             try {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' }, 
+                    video: { facingMode: currentFacingMode }, 
                     audio: false 
                 });
                 video.srcObject = stream;
@@ -158,6 +165,11 @@
                 });
                 closeCamera();
             }
+        }
+
+        async function switchCamera() {
+            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+            await openCamera();
         }
 
         function closeCamera() {
