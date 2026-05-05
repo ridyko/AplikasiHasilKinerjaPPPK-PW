@@ -78,13 +78,23 @@
                         <input type="text" name="uraian_tugas" class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-slate-800 dark:text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Apa yang Anda kerjakan?" required>
                     </div>
 
-                    <!-- Image Upload & Submit -->
-                    <div class="flex items-end space-x-4">
-                        <div class="flex-1 space-y-2">
-                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Gambar (Opsional)</label>
-                            <input type="file" name="image" class="w-full text-xs text-slate-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 transition-all" accept="image/*">
+                    <!-- Image Upload & Submit (Responsive Fix) -->
+                    <div class="flex flex-col sm:flex-row items-end gap-4">
+                        <div class="w-full space-y-2">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Bukti Foto (Kamera/Galeri)</label>
+                            <div class="flex flex-col space-y-2">
+                                <input type="file" name="image" id="image-input" capture="environment" class="w-full text-xs text-slate-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 transition-all" accept="image/*">
+                                <button type="button" onclick="openCamera()" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 flex items-center hover:underline">
+                                    <i class="fas fa-camera mr-1"></i> Ambil Foto dari Kamera
+                                </button>
+                                <input type="hidden" name="captured_image" id="captured_image">
+                                <div id="camera-preview-container" class="hidden relative mt-2">
+                                    <img id="camera-preview-img" class="w-20 h-20 object-cover rounded-xl border-2 border-blue-500 shadow-sm">
+                                    <button type="button" onclick="resetCamera()" class="absolute -top-2 -right-2 bg-rose-500 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center shadow-lg"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
                         </div>
-                        <button type="submit" class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 dark:shadow-none transform active:scale-95 transition-all">
+                        <button type="submit" class="w-full sm:w-auto bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 dark:shadow-none transform active:scale-95 transition-all">
                             SIMPAN
                         </button>
                     </div>
@@ -159,8 +169,104 @@
         </div>
     </div>
 
+    <!-- Camera Modal -->
+    <div id="camera-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold dark:text-white">Ambil Foto</h3>
+                <button onclick="closeCamera()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="relative bg-black rounded-2xl overflow-hidden aspect-video">
+                    <video id="webcam" autoplay playsinline class="w-full h-full object-cover"></video>
+                    <canvas id="canvas" class="hidden"></canvas>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="button" onclick="takeSnapshot()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 dark:shadow-none">
+                        <i class="fas fa-circle mr-2"></i> JEPRET
+                    </button>
+                    <button type="button" onclick="closeCamera()" class="px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl font-bold hover:bg-slate-200 transition-all">
+                        BATAL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        let stream = null;
+
+        async function openCamera() {
+            const modal = document.getElementById('camera-modal');
+            const video = document.getElementById('webcam');
+            
+            modal.classList.remove('hidden');
+            
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' }, 
+                    audio: false 
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kamera Tidak Terdeteksi',
+                    text: 'Pastikan Anda memberikan izin akses kamera di browser Anda.'
+                });
+                closeCamera();
+            }
+        }
+
+        function closeCamera() {
+            const modal = document.getElementById('camera-modal');
+            const video = document.getElementById('webcam');
+            
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            video.srcObject = null;
+            modal.classList.add('hidden');
+        }
+
+        function takeSnapshot() {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            const preview = document.getElementById('camera-preview-img');
+            const previewContainer = document.getElementById('camera-preview-container');
+            const hiddenInput = document.getElementById('captured_image');
+            const fileInput = document.getElementById('image-input');
+
+            // Set canvas size to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw image to canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Get data URL
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            
+            // Set values
+            hiddenInput.value = dataUrl;
+            preview.src = dataUrl;
+            previewContainer.classList.remove('hidden');
+            
+            // Clear file input if used
+            fileInput.value = "";
+
+            closeCamera();
+        }
+
+        function resetCamera() {
+            document.getElementById('captured_image').value = "";
+            document.getElementById('camera-preview-container').classList.add('hidden');
+        }
+
         @if(session('success'))
             Swal.fire({ 
                 icon: 'success', 

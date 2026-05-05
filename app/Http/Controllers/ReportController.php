@@ -88,15 +88,31 @@ class ReportController extends Controller
 
     // Logika simpan gambar jika ada file yang diunggah
     if ($request->hasFile('image')) {
-    $file = $request->file('image');
-    // Membuat nama file unik
-    $filename = time() . '_' . $file->getClientOriginalName();
-    
-    // Simpan secara fisik ke: storage/app/public/reports
-    $file->storeAs('reports', $filename, 'public');
-    
-    $data['image'] = $filename;
-}
+        $file = $request->file('image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->storeAs('reports', $filename, 'public');
+        $data['image'] = $filename;
+    } 
+    // Logika simpan gambar dari kamera (Base64)
+    elseif ($request->filled('captured_image')) {
+        $img = $request->input('captured_image');
+        $img = preg_replace('#^data:image/\w+;base64,#i', '', $img);
+        $img = str_replace(' ', '+', $img);
+        $imageData = base64_decode($img);
+        
+        if ($imageData) {
+            $filename = time() . '_captured.jpg';
+            $path = storage_path('app/public/reports/' . $filename);
+            
+            // Pastikan folder ada
+            if (!file_exists(storage_path('app/public/reports'))) {
+                mkdir(storage_path('app/public/reports'), 0777, true);
+            }
+
+            file_put_contents($path, $imageData);
+            $data['image'] = $filename;
+        }
+    }
 
     $data['nama'] = auth()->user()->name;
     $data['role'] = strtoupper($request->role);
@@ -116,20 +132,36 @@ public function update(Request $request, $id) {
     $report = WorkReport::findOrFail($id);
     $data = $request->all();
 
-    if ($request->hasFile('image')) {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
+    if ($request->hasFile('image') || $request->filled('captured_image')) {
         // Hapus file lama jika ada
         if ($report->image && \Storage::disk('public')->exists('reports/' . $report->image)) {
             \Storage::disk('public')->delete('reports/' . $report->image);
         }
 
-        $file = $request->file('image');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $file->storeAs('reports', $filename, 'public');
-        $data['image'] = $filename;
+        if ($request->hasFile('image')) {
+            $request->validate(['image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048']);
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('reports', $filename, 'public');
+            $data['image'] = $filename;
+        } elseif ($request->filled('captured_image')) {
+            $img = $request->input('captured_image');
+            $img = preg_replace('#^data:image/\w+;base64,#i', '', $img);
+            $img = str_replace(' ', '+', $img);
+            $imageData = base64_decode($img);
+
+            if ($imageData) {
+                $filename = time() . '_captured.jpg';
+                $path = storage_path('app/public/reports/' . $filename);
+                
+                if (!file_exists(storage_path('app/public/reports'))) {
+                    mkdir(storage_path('app/public/reports'), 0777, true);
+                }
+
+                file_put_contents($path, $imageData);
+                $data['image'] = $filename;
+            }
+        }
     }
 
     $report->update($data);
